@@ -6,6 +6,8 @@ var nconf = require('nconf');
 var async = require('async');
 var logger = require('winston');
 
+var environment = nconf.get('NODE_ENV') || 'development';
+
 // Load Environment variables from .env file
 require('dotenv').load();
 
@@ -16,7 +18,8 @@ nconf.argv();
 // Load environment variables
 nconf.env();
 // Load config file for the environment
-require('./config/environments/' + nconf.get('NODE_ENV'));
+
+require('./config/environments/' + environment);
 
 logger.info('[APP] Starting server initialization');
 
