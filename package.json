@@ -1,0 +1,25 @@
+{
+  "name": "storj-cdnproxy",
+  "version": "0.0.1",
+  "description": "Serves images over http from a Storj bucket",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Philip Hutchins",
+  "license": "ISC",
+  "dependencies": {
+    "async": "^2.0.0-rc.3",
+    "body-parser": "^1.15.0",
+    "change-case": "^2.3.1",
+    "dotenv": "^2.0.0",
+    "express": "^4.13.4",
+    "http": "0.0.0",
+    "morgan": "^1.7.0",
+    "nconf": "^0.8.4",
+    "path": "^0.12.7",
+    "require-dir": "^0.3.0",
+    "storj-bridge-client": "^0.3.6",
+    "winston": "^2.2.0"
+  }
+}
