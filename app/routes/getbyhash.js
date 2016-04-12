@@ -1,15 +1,19 @@
 // app/routes/ping.js
 'use strict';
 
+var config = require('nconf');
+
 module.exports = function(router) {
     var fs = require('fs');
+    var apiKey = process.env.API_KEY;
+    var bucket = process.env.BUCKET;
 
     // Import the library
     var StorjAPI = require('storj-bridge-client');
 
     // Create a client authenticated with your key
     var client = new StorjAPI.Client('https://api.storj.io', {
-      keypair: new StorjAPI.KeyPair('23b143dadba0a07ae1107fc088ad4167f1cbfff1e581be76c8eb7b69af37ac54')
+      keypair: new StorjAPI.KeyPair(apiKey)
     });
 
   router.route('/:imageHash')
@@ -17,7 +21,6 @@ module.exports = function(router) {
     console.log("Image Hash: " + req.params.imageHash);
 
     // Keep track of the bucket ID and file hash
-    var bucket = '5705567e894c2ad76df71df9';
     var filehash = req.params.imageHash;
 
     client.createToken(bucket, 'PULL').then(function(token) {

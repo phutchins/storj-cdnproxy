@@ -36,10 +36,10 @@ var start =  function(cb) {
     next(err);
   });
 
-  //app.listen(config.get('NODE_PORT'));
-  //logger.info('[SERVER] Listening on port ' + config.get('NODE_PORT'));
-  app.listen(3033);
-  logger.info('[SERVER] Listening on port 3033');
+  app.listen(config.get('NODE_PORT'));
+  logger.info('[SERVER] Listening on port ' + config.get('NODE_PORT'));
+  //app.listen(3033);
+  //logger.info('[SERVER] Listening on port 3033');
 
   if (cb) {
     return cb();
