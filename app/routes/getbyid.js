@@ -13,7 +13,7 @@ var through = require('through');
 module.exports = function(router) {
   var fs = require('fs');
   var apiKey = process.env.API_KEY;
-  var bucket = process.env.BUCKET;
+  var bucketId = process.env.BUCKETID;
   var keypass = process.env.KEYPASS;
   var DATADIR = process.env.DATADIR;
   var bridgeURL = process.env.BRIDGEURL || 'https://api.storj.io';
@@ -34,12 +34,12 @@ module.exports = function(router) {
     return console.log('Unable to unlock keyring, bad password? Error: %s', err);
   }
 
-  router.route('/:id')
+  router.route('/:fileId')
   .get(function(req, res) {
 
     // Keep track of the bucket ID and file hash
-    var id = req.params.id;
-    var secret = keyring.get(id);
+    var fileId = req.params.fileId;
+    var secret = keyring.get(fileId);
     var decrypter = new Storj.DecryptStream(secret);
 
     var streamLogger = through(function(data) {
@@ -47,35 +47,16 @@ module.exports = function(router) {
       this.queue(data);
     });
 
-    console.log("Request for image hash: " + req.params.id);
+    console.log("Request for image hash: " + fileId);
 
-    client.createToken(bucket, 'PULL', function(err, token) {
-      console.log('Token for PULL created, getting file pointers...');
+    client.createFileStream(bucketId, fileId, function(err, stream) {
+      if (err) {
+        return console.log('Error getting stream for file %s, ERR: %s', fileId, err);
+      }
 
+      console.log('Got stream for file with id %s, piping to decrypter', fileId);
 
-      //async.retry(3, function(cb, result) {
-        client.getFilePointers({
-          bucket: token.bucket,
-          token: token.token,
-          file: id
-        }, function(err, pointers) {
-          if (err) {
-            console.log('Error getting file pointers: %s', err);
-            return console.log('Trying again...');
-          }
-
-          //return cb(err, pointers);
-      //}, function(err, pointers) {
-
-        console.log('Got pointers for file. Resolving pointers.');
-
-        client.resolveFileFromPointers(pointers, function(err, stream, queue) {
-          console.log('Pointers resolved. Decrypting file and piping to client');
-
-          stream.pipe(decrypter).pipe(res);
-        });
-      //});
-      });
+      stream.pipe(decrypter).pipe(res);
     });
   })
   .post(function(req, res, next) {

@@ -4,7 +4,8 @@
   "description": "Serves images over http from a Storj bucket",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index"
   },
   "author": "Philip Hutchins",
   "license": "ISC",
@@ -12,6 +13,7 @@
     "async": "^2.0.0-rc.3",
     "body-parser": "^1.15.0",
     "change-case": "^2.3.1",
+    "cron": "^1.1.0",
     "dotenv": "^2.0.0",
     "express": "^4.13.4",
     "http": "0.0.0",
