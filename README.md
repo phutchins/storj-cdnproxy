@@ -11,7 +11,7 @@ Create a `.env` file in the root directory of the repository. Add your bucket ha
 ```
 NODE_PORT=3033
 API_KEY=yourapikeyhere
-BUCKET=yourbuckethashhere
+BUCKETID=yourbuckethashhere
 KEYPASS=keyringpassword
 DATADIR=/path/to/key.ring
 ```
