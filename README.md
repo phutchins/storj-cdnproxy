@@ -13,7 +13,7 @@ NODE_PORT=3033
 API_KEY=yourapikeyhere
 BUCKET=yourbuckethashhere
 KEYPASS=keyringpassword
-DATADIR=/path/to/key.ring
+DATADIR=/home/user/.storjcli/
 ```
 
 ## Run

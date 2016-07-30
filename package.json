@@ -20,8 +20,10 @@
     "morgan": "^1.7.0",
     "nconf": "^0.8.4",
     "path": "^0.12.7",
+    "pug": "^2.0.0-beta4",
     "require-dir": "^0.3.0",
     "storj": "2.0.3",
+    "through": "^2.3.8",
     "winston": "^2.2.0"
   }
 }

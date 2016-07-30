@@ -17,6 +17,11 @@ var start =  function(cb) {
   // Configure express
   app = express();
 
+  app.use(function(err, req, res, next) {
+    logger.debug('[SERVER] Passing through app.use first');
+    next(err);
+  });
+
   app.use(morgan('common'));
   app.use(bodyParser.urlencoded({extended: true}));
   app.use(bodyParser.json({type: '*/*'}));

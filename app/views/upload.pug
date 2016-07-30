@@ -1,0 +1,38 @@
+doctype html
+html(lang="en", class="js")
+  head
+    title= UploadFiles
+    style
+      include ../css/upload.css
+    script
+      include ../js/jquery-3.1.0.min.js
+  body
+    div(class="container", role="main")
+      h1 Storj Link Upload
+      form(class="box", method="post", action="http://localhost:3033/upload/", enctype="multipart/x-www-form-urlencoded")
+        div(class="box__input")
+          input(class="box__file", type="file", name="files[]", id="file", data-multiple-caption="{count}, files selected" multiple)
+          label(for="file")
+            strong
+              p
+                | Choose a file
+            span(class="box__dragndrop")
+              p
+                | or drag it here
+          button(class="box__button", type="submit")
+            p
+              | Upload
+        div(class="box__uploading")
+          p
+            | Uploading&hellip;
+        div(class="box__success")
+          p
+            | Done!
+        div(class="box__error")
+          p
+            | Error
+          span
+          p
+            | .
+    script
+      include ../js/upload.js
