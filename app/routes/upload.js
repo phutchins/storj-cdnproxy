@@ -23,6 +23,8 @@ module.exports = function(router) {
   .post(function(req, res) {
     // Accept file stream
     req.on('data', function(data) {
+      // Save the file here from the data received
+      // this method will be implemented later, for now we will just use binaryJS
       console.log('Got some data: ', data);
     });
 

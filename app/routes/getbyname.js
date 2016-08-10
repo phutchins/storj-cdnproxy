@@ -16,7 +16,7 @@ module.exports = function(router) {
   var Storj = require('storj');
   var apiKey = process.env.API_KEY;
   var bucketId = process.env.BUCKETID;
-  var keypass = process.env.KEYPASS;
+  var KEYPASS = process.env.KEYPASS;
   var bridgeEmail = process.env.BRIDGEEMAIL;
   var bridgePass = process.env.BRIDGEPASS;
   var DATADIR = process.env.DATADIR;
@@ -42,7 +42,7 @@ module.exports = function(router) {
   var privKey = keyPair.getPrivateKey();
 
 	try {
-		keyring = Storj.KeyRing(DATADIR, keypass);
+		keyring = Storj.KeyRing(DATADIR, KEYPASS);
 	} catch (err) {
 		return console.log('Unable to unlock keyring, bad password? Error: %s', err);
 	}
@@ -54,28 +54,37 @@ module.exports = function(router) {
     console.log('Type of bucketId: ', typeof(bucketId));
 		client.listFilesInBucket(bucketId, function(err, files) {
       if (err) {
-        return console.log('Error listing files in bucket: ', err);
+        console.log('Error listing files in bucket: ', err);
+        return callback(err, null);
       }
 
 			var count = 0;
 			var fileCount = files.length;
 			var fileNameIndex = {};
+      var count = 0;
 
-			files.forEach(function(fileData) {
-				fileNameIndex[fileData.filename] = fileData;
+      while ( count < fileCount ) {
+        var file = files[count];
+				fileNameIndex[file.filename] = file;
 
 				count++;
 
 				if (count == fileCount) {
-					callback(fileNameIndex);
+					callback(null, fileNameIndex);
 				}
-			});
+			};
 		});
 	};
 
   console.log('Bucket id: ', bucketId);
 
-	getFileList(bucketId, function(index) {
+	getFileList(bucketId, function(err, index) {
+    if (err) {
+      return console.log('Error getting file list: %s', err);
+    }
+
+    console.log('Initial file list: ', fileNameIndex);
+
 		fileNameIndex = index;
 
 		router.route('/:fileName')
@@ -92,7 +101,7 @@ module.exports = function(router) {
 				this.queue(data);
 			});
 
-			console.log("Request for image name: " + fileName);
+			console.log("Request for file name: " + fileName);
 
 			client.createFileStream(bucketId, fileId, function(err, stream) {
 				if (err) {
@@ -109,8 +118,13 @@ module.exports = function(router) {
 	});
 
 	new CronJob('3 * * * * *', function() {
-		console.log('Updating file list index');
-		getFileList(bucketId, function(index) {
+		getFileList(bucketId, function(err, index) {
+      if (err) {
+        return console.log('Error getting file list: %s', err);
+      }
+
+      console.log('New file list: ', fileNameIndex);
+
 			fileNameIndex = index;
 			console.log('File list updated');
 		});
