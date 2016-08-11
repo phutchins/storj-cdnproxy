@@ -30,11 +30,15 @@ Array.prototype.forEach.call( forms, function( form ) {
   var errorMsg   = form.querySelector( '.box__error span' );
   var restart     = form.querySelectorAll( '.box__restart' );
   var droppedFiles = false;
+
+  // This doesn't work but form submission isn't used yet, will soon to update the file list
+  form.getAttribute('action').replace('{hostUrl}', wsUrl);
+
   var showFiles   = function( files ) {
       label.textContent = files.length > 1 ? ( input.getAttribute( 'data-multiple-caption' ) || '' ).replace( '{count}', files.length ) : files[ 0 ].name;
   };
   var triggerFormSubmit = function(files) {
-    var binClient = BinaryJSClient.BinaryClient('ws://localhost:9000');
+    var binClient = BinaryJSClient.BinaryClient(wsUrl);
 
     binClient.on('open', function() {
       var self = this;

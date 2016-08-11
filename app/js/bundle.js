@@ -12,6 +12,17 @@ var isAdvancedUpload = function() {
   return ( ( 'draggable' in div ) || ( 'ondragstart' in div && 'ondrop' in div ) ) && 'FormData' in window && 'FileReader' in window;
 }();
 
+var hostUrl = document.location.protocol + "//" + document.location.hostname + ":" + document.location.port;
+var wsPort = "9000";
+var wsProtocol = "ws:";
+
+if (document.location.protocol === "https:") {
+  wsProtocol = "wss:";
+}
+
+debugger;
+var wsUrl = wsProtocol + document.location.hostname + ":" + wsPort;
+
 // applying the effect for every form
 var forms = document.querySelectorAll( '.box' );
 
@@ -21,11 +32,15 @@ Array.prototype.forEach.call( forms, function( form ) {
   var errorMsg   = form.querySelector( '.box__error span' );
   var restart     = form.querySelectorAll( '.box__restart' );
   var droppedFiles = false;
+
+  // This doesn't work but form submission isn't used yet, will soon to update the file list
+  form.getAttribute('action').replace('{hostUrl}', wsUrl);
+
   var showFiles   = function( files ) {
       label.textContent = files.length > 1 ? ( input.getAttribute( 'data-multiple-caption' ) || '' ).replace( '{count}', files.length ) : files[ 0 ].name;
   };
   var triggerFormSubmit = function(files) {
-    var binClient = BinaryJSClient.BinaryClient('ws://localhost:9000');
+    var binClient = BinaryJSClient.BinaryClient(wsUrl);
 
     binClient.on('open', function() {
       var self = this;
