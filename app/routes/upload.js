@@ -22,8 +22,6 @@ module.exports = function(router) {
           fileNameIndex: fileNameIndex
         };
 
-        console.log('File Name Index is: ', fileNameIndex);
-
         // Serve Jade template
         var html = pug.renderFile(path.join(__dirname, '../views/upload.pug'), options);
 
