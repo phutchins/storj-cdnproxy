@@ -12,6 +12,7 @@ var isAdvancedUpload = function() {
 }();
 
 var hostUrl = document.location.protocol + "//" + document.location.hostname + ":" + document.location.port;
+window.hostUrl = hostUrl;
 var wsPort = "9000";
 var wsProtocol = "ws:";
 
@@ -20,6 +21,7 @@ if (document.location.protocol === "https:") {
 }
 
 var wsUrl = wsProtocol + document.location.hostname + ":" + wsPort;
+window.wsUrl = wsUrl;
 
 // applying the effect for every form
 var forms = document.querySelectorAll( '.box' );
@@ -81,13 +83,15 @@ Array.prototype.forEach.call( forms, function( form ) {
   // automatically submit the form on file select
   input.addEventListener( 'change', function( e )
   {
-    var files = $(e.target).siblings(".box__file")[0].files;
+    //var files = $(e.target).siblings(".box__file")[0].files;
+    debugger;
 
+    var files = e.target.files;
     showFiles( e.target.files );
 
     console.log('Triggering form submit 1');
     triggerFormSubmit(files);
-    e.preventDefault();
+    //e.preventDefault();
   });
 
   // drag&drop files if the feature is available

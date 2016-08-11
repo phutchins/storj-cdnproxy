@@ -17,9 +17,19 @@ module.exports = function(router) {
       utils.getFileNameIndex(client, bucketId, function(err, fileNameIndex) {
         console.log('[UPLOAD] Got fileNameIndex');
 
+        // Build client URL from config
+        var hostSSL = config.get('NODE_EXT_SSL');
+        var hostPort = config.get('NODE_EXT_PORT');
+        var hostProtocol = ( hostSSL === "true" ) ? "https:" : "http:";
+        var hostname = config.get('HOSTNAME');
+        var hostUrl = hostProtocol + "//" + hostname + ":" + hostPort;
+
+        console.log('Passing in HOST URL: %s', hostUrl);
+
         var options = {
           pretty: true,
-          fileNameIndex: fileNameIndex
+          fileNameIndex: fileNameIndex,
+          hostUrl: hostUrl
         };
 
         // Serve Jade template
