@@ -68,6 +68,36 @@ module.exports = function(router) {
             return console.log('Error creating file stream: %s', err);
           }
 
+/*
+          var splitFileName = fileName.split('.');
+          var lastElementIndex = splitFileName.length-1;
+          var fileExtension = splitFileName[lastElementIndex];
+
+          if (fileExtension === 'svg') {
+            res.writeHead(200, {'Content-Type': 'image/svg+xml'});
+          }
+*/
+
+          var imgMime;
+          switch (fileName.toLowerCase().slice(-4))
+          {
+            case ".bmp":              imgMime = "bmp";     break;
+            case ".gif":              imgMime = "gif";     break;
+            case ".jpg": case "jpeg": imgMime = "jpeg";    break;
+            case ".png": case "apng": imgMime = "png";     break;
+            case ".svg": case "svgz": imgMime = "svg+xml"; break;
+            case ".tif": case "tiff": imgMime = "tiff";    break;
+            default: console.log("File does not appear to be an image: " + fileName); return;
+          }
+
+          if (imgMime) {
+            res.writeHead(200, {'Content-Type': 'image/' + imgMime});
+          }
+
+          if (!imgMime) {
+            console.log("File type unknown");
+          }
+
           console.log('Got file stream for file', fileName);
           stream.pipe(decrypter).pipe(res);
         });
