@@ -83,15 +83,11 @@ Array.prototype.forEach.call( forms, function( form ) {
   // automatically submit the form on file select
   input.addEventListener( 'change', function( e )
   {
-    //var files = $(e.target).siblings(".box__file")[0].files;
-    debugger;
-
     var files = e.target.files;
     showFiles( e.target.files );
 
     console.log('Triggering form submit 1');
     triggerFormSubmit(files);
-    //e.preventDefault();
   });
 
   // drag&drop files if the feature is available
