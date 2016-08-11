@@ -5,23 +5,33 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index"
+    "start": "node index",
+    "build": "browserify ./app/src/upload.js -o ./app/js/bundle.js"
   },
   "author": "Philip Hutchins",
   "license": "ISC",
   "dependencies": {
     "async": "^2.0.0-rc.3",
+    "binaryjs": "^0.2.1",
+    "binaryjs-client": "^1.0.0",
     "body-parser": "^1.15.0",
+    "bufferutil": "^1.2.1",
     "change-case": "^2.3.1",
     "cron": "^1.1.0",
     "dotenv": "^2.0.0",
     "express": "^4.13.4",
+    "flip-stream-js": "^0.1.5",
     "http": "0.0.0",
     "morgan": "^1.7.0",
     "nconf": "^0.8.4",
     "path": "^0.12.7",
+    "pug": "^2.0.0-beta4",
     "require-dir": "^0.3.0",
-    "storj": "2.0.3",
+    "storj": "^2.0.3",
+    "through": "^2.3.8",
     "winston": "^2.2.0"
+  },
+  "devDependencies": {
+    "browserify": "^13.1.0"
   }
 }

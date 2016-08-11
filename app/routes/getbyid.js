@@ -13,26 +13,41 @@ var through = require('through');
 module.exports = function(router) {
   var fs = require('fs');
   var apiKey = process.env.API_KEY;
-  var bucketId = process.env.BUCKETID;
-  var keypass = process.env.KEYPASS;
+  var BUCKETID = process.env.BUCKETID;
+  var bridgeEmail = process.env.BRIDGEEMAIL;
+  var bridgePass = process.env.BRIDGEPASS;
+  var KEYPASS = process.env.KEYPASS;
   var DATADIR = process.env.DATADIR;
   var bridgeURL = process.env.BRIDGEURL || 'https://api.storj.io';
 
   // Import the library
   var Storj = require('storj');
 
-  // Create a client authenticated with your key
-  var client = new Storj.BridgeClient(bridgeURL, {
-    keypair: new Storj.KeyPair(apiKey)
-  });
+  var options = {
+    basicauth: {
+      email: bridgeEmail,
+      password: bridgePass
+    }
+  };
 
+  var client = new Storj.BridgeClient(bridgeURL, options);
   var keyring;
 
   try {
-    keyring = Storj.KeyRing(DATADIR, keypass);
+    keyring = Storj.KeyRing(DATADIR, KEYPASS);
   } catch (err) {
     return console.log('Unable to unlock keyring, bad password? Error: %s', err);
   }
+
+  client.getBuckets(function(err, buckets) {
+		if (err) {
+			return console.log('error', err.message);
+		}
+
+		if (!buckets.length) {
+			return console.log('warn', 'You have not created any buckets.');
+		}
+	});
 
   router.route('/:fileId')
   .get(function(req, res) {
@@ -49,9 +64,10 @@ module.exports = function(router) {
 
     console.log("Request for image hash: " + fileId);
 
-    client.createFileStream(bucketId, fileId, function(err, stream) {
+    client.createFileStream(BUCKETID, fileId, function(err, stream) {
       if (err) {
-        return console.log('Error getting stream for file %s, ERR: %s', fileId, err);
+        console.log('Error getting stream for file %s from bucket %s, ERR: %s', fileId, BUCKETID, err);
+        return res.sendStatus(404);
       }
 
       console.log('Got stream for file with id %s, piping to decrypter', fileId);
