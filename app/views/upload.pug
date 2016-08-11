@@ -6,7 +6,10 @@ html(lang="en", class="js")
       include ../css/upload.css
     script
       include ../js/jquery-3.1.0.min.js
+    script.
+      window.fileNameIndex = !{JSON.stringify(fileNameIndex)};
   body
+    img(src="http://localhost:3033/getbyid/57abc84f9a1e48163c359a4c")
     div(class="container", role="main")
       h1 Storj Link Upload
       form(class="box", method="post", action="http://localhost:3033/upload/", enctype="multipart/x-www-form-urlencoded")
@@ -34,5 +37,15 @@ html(lang="en", class="js")
           span
           p
             | .
+      div(class="box__files")
+        if fileNameIndex
+          each data, fileName in fileNameIndex
+            li= fileName + ': Get by: '
+              | [
+              a(href="http://localhost:3033/getbyid/"+data.id) ID
+              | ] [
+              a(href="http://localhost:3033/getbyname/"+fileName) NAME
+              | ]
+
     script
       include ../js/bundle.js

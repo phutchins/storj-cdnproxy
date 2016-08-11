@@ -5,6 +5,7 @@ var config = require('nconf');
 var async = require('async');
 var through = require('through');
 var CronJob = require('cron').CronJob;
+var utils = require('../lib/utils');
 
 // Add get file by filename
 // Add ability to upload file with a put
@@ -22,111 +23,69 @@ module.exports = function(router) {
   var DATADIR = process.env.DATADIR;
   var bridgeURL = process.env.BRIDGEURL || 'https://api.storj.io';
   var fileNameIndex = {};
+  var client;
 
   // Create a client authenticated with your key
+  utils.getBasicAuthClient(function(newClient) {
+    var self = this;
+    client = newClient;
 
-  var options = {
-    basicauth: {
-      email: bridgeEmail,
-      password: bridgePass
-    }
-  };
+    var keyring;
 
-  var client = new Storj.BridgeClient(bridgeURL, options);
-	var keyPair = Storj.KeyPair();
-
-	console.log('This device has been successfully paired.');
-
-	var keyring;
-
-  var privKey = keyPair.getPrivateKey();
-
-	try {
-		keyring = Storj.KeyRing(DATADIR, KEYPASS);
-	} catch (err) {
-		return console.log('Unable to unlock keyring, bad password? Error: %s', err);
-	}
-
-	var getFileList = function(bucketId, callback) {
-	// Get the list of files from the configured bucket
-	// Repeat every minute
-
-    console.log('Type of bucketId: ', typeof(bucketId));
-		client.listFilesInBucket(bucketId, function(err, files) {
-      if (err) {
-        console.log('Error listing files in bucket: ', err);
-        return callback(err, null);
-      }
-
-			var count = 0;
-			var fileCount = files.length;
-			var fileNameIndex = {};
-      var count = 0;
-
-      while ( count < fileCount ) {
-        var file = files[count];
-				fileNameIndex[file.filename] = file;
-
-				count++;
-
-				if (count == fileCount) {
-					callback(null, fileNameIndex);
-				}
-			};
-		});
-	};
-
-  console.log('Bucket id: ', bucketId);
-
-	getFileList(bucketId, function(err, index) {
-    if (err) {
-      return console.log('Error getting file list: %s', err);
+    try {
+      keyring = Storj.KeyRing(DATADIR, KEYPASS);
+    } catch (err) {
+      return console.log('Unable to unlock keyring, bad password? Error: %s', err);
     }
 
-    console.log('Initial file list: ', fileNameIndex);
+    console.log('Bucket id: ', bucketId);
 
-		fileNameIndex = index;
-
-		router.route('/:fileName')
-		.get(function(req, res) {
-
-			// Keep track of the bucket ID and file hash
-			var fileName = req.params.fileName;
-			var fileId = fileNameIndex[fileName].id;
-			var secret = keyring.get(fileId);
-			var decrypter = new Storj.DecryptStream(secret);
-
-			var streamLogger = through(function(data) {
-				console.log('Got data from stream...');
-				this.queue(data);
-			});
-
-			console.log("Request for file name: " + fileName);
-
-			client.createFileStream(bucketId, fileId, function(err, stream) {
-				if (err) {
-					return console.log('Error creating file stream: %s', err);
-				}
-
-				console.log('Got file stream for file', fileName);
-				stream.pipe(decrypter).pipe(res);
-			});
-		})
-		.post(function(req, res, next) {
-			return res.sendStatus(200);
-		});
-	});
-
-	new CronJob('3 * * * * *', function() {
-		getFileList(bucketId, function(err, index) {
+    utils.getFileNameIndex(client, bucketId, function(err, index) {
       if (err) {
         return console.log('Error getting file list: %s', err);
       }
 
-      console.log('New file list: ', fileNameIndex);
+      fileNameIndex = index;
 
-			fileNameIndex = index;
-			console.log('File list updated');
-		});
-	}, null, true);
+      router.route('/:fileName')
+      .get(function(req, res) {
+
+        // Keep track of the bucket ID and file hash
+        var fileName = req.params.fileName;
+        var fileId = fileNameIndex[fileName].id;
+        var secret = keyring.get(fileId);
+        var decrypter = new Storj.DecryptStream(secret);
+
+        var streamLogger = through(function(data) {
+          console.log('Got data from stream...');
+          this.queue(data);
+        });
+
+        console.log("Request for file name: " + fileName);
+
+        client.createFileStream(bucketId, fileId, function(err, stream) {
+          if (err) {
+            return console.log('Error creating file stream: %s', err);
+          }
+
+          console.log('Got file stream for file', fileName);
+          stream.pipe(decrypter).pipe(res);
+        });
+      })
+      .post(function(req, res, next) {
+        return res.sendStatus(200);
+      });
+    });
+
+    new CronJob('0,10,20,30,40,50 * * * * *', function() {
+      utils.getFileNameIndex(client, bucketId, function(err, index) {
+        if (err) {
+          return console.log('Error getting file list: %s', err);
+        }
+
+        fileNameIndex = index;
+        console.log('File list updated');
+      });
+    }, null, true);
+  });
 };

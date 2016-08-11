@@ -3,22 +3,33 @@
 var config = require('nconf');
 var pug = require('pug');
 var path = require('path');
+var utils = require('../lib/utils');
+var bucketId = process.env.BUCKETID;
 
 module.exports = function(router) {
   router.route('/')
   .get(function(req, res) {
-    // Serve Jade template
-    var locals;
-    var options = {
-      pretty: true,
-      locals: {
-        count: 32
-      }
-    };
+    // get file list
+    console.log('[UPLOAD] Rendering page...');
+    utils.getBasicAuthClient(function(client) {
 
-    var html = pug.renderFile(path.join(__dirname, '../views/upload.pug'), options);
+      console.log('[UPLOAD] Got basic auth client...');
+      utils.getFileNameIndex(client, bucketId, function(err, fileNameIndex) {
+        console.log('[UPLOAD] Got fileNameIndex');
 
-    res.send(html);
+        var options = {
+          pretty: true,
+          fileNameIndex: fileNameIndex
+        };
+
+        console.log('File Name Index is: ', fileNameIndex);
+
+        // Serve Jade template
+        var html = pug.renderFile(path.join(__dirname, '../views/upload.pug'), options);
+
+        res.send(html);
+      });
+    });
   })
   .post(function(req, res) {
     // Accept file stream

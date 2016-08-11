@@ -14,6 +14,8 @@ module.exports = function(router) {
   var fs = require('fs');
   var apiKey = process.env.API_KEY;
   var BUCKETID = process.env.BUCKETID;
+  var bridgeEmail = process.env.BRIDGEEMAIL;
+  var bridgePass = process.env.BRIDGEPASS;
   var KEYPASS = process.env.KEYPASS;
   var DATADIR = process.env.DATADIR;
   var bridgeURL = process.env.BRIDGEURL || 'https://api.storj.io';
@@ -21,11 +23,14 @@ module.exports = function(router) {
   // Import the library
   var Storj = require('storj');
 
-  // Create a client authenticated with your key
-  var client = new Storj.BridgeClient(bridgeURL, {
-    keypair: new Storj.KeyPair(apiKey)
-  });
+  var options = {
+    basicauth: {
+      email: bridgeEmail,
+      password: bridgePass
+    }
+  };
 
+  var client = new Storj.BridgeClient(bridgeURL, options);
   var keyring;
 
   try {
@@ -42,14 +47,6 @@ module.exports = function(router) {
 		if (!buckets.length) {
 			return console.log('warn', 'You have not created any buckets.');
 		}
-
-		buckets.forEach(function(bucket) {
-			console.log(
-				'info',
-				'ID: %s, Name: %s, Storage: %s, Transfer: %s',
-				[bucket.id, bucket.name, bucket.storage, bucket.transfer]
-			);
-		});
 	});
 
   router.route('/:fileId')
