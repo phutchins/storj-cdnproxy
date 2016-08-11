@@ -11,6 +11,16 @@ var isAdvancedUpload = function() {
   return ( ( 'draggable' in div ) || ( 'ondragstart' in div && 'ondrop' in div ) ) && 'FormData' in window && 'FileReader' in window;
 }();
 
+var hostUrl = document.location.protocol + "//" + document.location.hostname + ":" + document.location.port;
+var wsPort = "9000";
+var wsProtocol = "ws:";
+
+if (document.location.protocol === "https:") {
+  wsProtocol = "wss:";
+}
+
+var wsUrl = wsProtocol + document.location.hostname + ":" + wsPort;
+
 // applying the effect for every form
 var forms = document.querySelectorAll( '.box' );
 

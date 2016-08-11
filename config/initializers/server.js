@@ -56,7 +56,7 @@ var start = function(cb) {
 
   var binaryServer = BinaryJS.BinaryServer({server: binHttpServer});
 
-  binHttpServer.listen(9000);
+  binHttpServer.listen(config.get('BS_PORT'));
 
   binaryServer.on('connection', function(binClient) {
     // Send this to handle binary client

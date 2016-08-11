@@ -14,6 +14,8 @@ Create a `.env` file in the root directory of the repository. Add your bucket ha
 
 ```
 NODE_PORT=3033
+BS_PORT=8888
+BS_EXT_PORT=9000
 BUCKET=yourbuckethashhere
 KEYPASS=keyringpassword
 BRIDGEEMAIL=yourbridgeemail
